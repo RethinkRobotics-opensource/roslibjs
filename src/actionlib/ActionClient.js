@@ -22,6 +22,12 @@ var EventEmitter2 = require('eventemitter2').EventEmitter2;
  *   * serverName - the action server name, like /fibonacci
  *   * actionName - the action message name, like 'actionlib_tutorials/FibonacciAction'
  *   * timeout - the timeout length when connecting to the action server
+ *   * omitFeedback - whether or not to subscribe to action feedback
+ *   * feedbackOptions - topic options for feedback topic
+ *   * omitStatus - whether or not to subscribe to status
+ *   * statusOptions - topic options for status topic
+ *   * omitResult - whether or not to subscribe to result
+ *   * resultOptions - topic options for result topic
  */
 function ActionClient(options) {
   var that = this;
@@ -39,23 +45,23 @@ function ActionClient(options) {
   var receivedStatus = false;
 
   // create the topics associated with actionlib
-  var feedbackListener = new Topic({
-    ros : this.ros,
-    name : this.serverName + '/feedback',
-    messageType : this.actionName + 'Feedback'
-  });
+  var feedbackOptions = options.feedbackOptions || {};
+  feedbackOptions.ros = this.ros;
+  feedbackOptions.name = this.serverName + '/feedback';
+  feedbackOptions.messageType = this.actionName + 'Feedback';
+  var feedbackListener = new Topic(feedbackOptions);
 
-  var statusListener = new Topic({
-    ros : this.ros,
-    name : this.serverName + '/status',
-    messageType : 'actionlib_msgs/GoalStatusArray'
-  });
+  var statusOptions = options.statusOptions || {};
+  statusOptions.ros = this.ros;
+  statusOptions.name = this.serverName + '/status';
+  statusOptions.messageType = 'actionlib_msgs/GoalStatusArray';
+  var statusListener = new Topic(statusOptions);
 
-  var resultListener = new Topic({
-    ros : this.ros,
-    name : this.serverName + '/result',
-    messageType : this.actionName + 'Result'
-  });
+  var resultOptions = options.resultOptions || {};
+  resultOptions.ros = this.ros;
+  resultOptions.name = this.serverName + '/result';
+  resultOptions.messageType = this.actionName + 'Result';
+  var resultListener = new Topic(resultOptions);
 
   this.goalTopic = new Topic({
     ros : this.ros,
